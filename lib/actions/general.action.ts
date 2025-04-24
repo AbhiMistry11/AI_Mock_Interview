@@ -97,9 +97,10 @@ export async function getLatestInterviews(
 
   const interviews = await db
     .collection("interviews")
-    .orderBy("createdAt", "desc")
     .where("finalized", "==", true)
-    .where("userId", "!=", userId)
+    .where("userId", "!=", userId) // Requires composite index
+    .orderBy("userId")             // Needed when using '!='
+    .orderBy("createdAt", "desc")  // Sort results
     .limit(limit)
     .get();
 
@@ -108,6 +109,7 @@ export async function getLatestInterviews(
     ...doc.data(),
   })) as Interview[];
 }
+
 
 export async function getInterviewsByUserId(
   userId: string
